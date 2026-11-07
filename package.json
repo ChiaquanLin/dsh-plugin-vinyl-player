@@ -18,10 +18,11 @@
     "README.md",
     "LICENSE",
     "LEGAL.md",
-    "SECURITY.md"
+    "SECURITY.md",
+    "docs/*.svg"
   ],
   "scripts": {
-    "test": "node tools/buffer-check.mjs && node tools/unseekable-check.mjs && node tools/seekland-check.mjs && node tools/seekguard-check.mjs && node tools/seekapply-check.mjs && node tools/seek-check.mjs && node tools/label-check.mjs && node tools/cover-check.mjs && node tools/layout-check.mjs && node tools/round-check.mjs && node tools/artifact-check.mjs && node tools/arm-check.mjs && node tools/client-check.mjs && node tools/host-check.mjs",
+    "test": "node tools/render-shot.mjs && node tools/render-diagram.mjs && node tools/buffer-check.mjs && node tools/unseekable-check.mjs && node tools/seekland-check.mjs && node tools/seekguard-check.mjs && node tools/seekapply-check.mjs && node tools/seek-check.mjs && node tools/label-check.mjs && node tools/cover-check.mjs && node tools/layout-check.mjs && node tools/round-check.mjs && node tools/artifact-check.mjs && node tools/arm-check.mjs && node tools/client-check.mjs && node tools/host-check.mjs",
     "test:label": "node tools/label-check.mjs",
     "test:layout": "node tools/layout-check.mjs",
     "test:round": "node tools/round-check.mjs",
@@ -38,7 +39,9 @@
     "test:e2e": "node tools/e2e-probe.mjs",
     "test:unseekable": "node tools/unseekable-check.mjs",
     "test:blob": "node tools/blob-probe.mjs",
-    "test:buffer": "node tools/buffer-check.mjs"
+    "test:buffer": "node tools/buffer-check.mjs",
+    "build:images": "node tools/render-shot.mjs && node tools/render-diagram.mjs",
+    "test:images": "node tools/render-shot.mjs && node tools/render-diagram.mjs"
   },
   "dsh": {
     "bundle": {

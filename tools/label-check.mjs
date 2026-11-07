@@ -95,7 +95,7 @@ check(
   String(image?.props?.href ?? '').slice(0, 60),
 );
 check('the image fills its box', image?.props?.preserveAspectRatio === 'xMidYMid slice', image?.props?.preserveAspectRatio);
-check('the image carries no clipPath of its own', image?.props?.clipPath === undefined, String(image?.props?.clipPath));
+check('the image is clipped to the label circle', String(image?.props?.clipPath ?? '') === 'url(#vr-label-art-clip)', String(image?.props?.clipPath));
 
 // The address must carry a version tag. An earlier build requested the cover at a
 // different path, and the browser still holds whatever it cached under that URL;
@@ -139,14 +139,16 @@ const failedRender = (() => {
 check('the decode-failure handler is wired', failedRender);
 
 // --- 2. it is drawn through a pattern anchored to the label ---------------
-const pattern = withCover.find((n) => n.type === 'pattern');
-check('a pattern wraps the artwork', pattern !== undefined);
-check('the pattern id is referenced by a circle', withCover.some((n) => n.type === 'circle' && String(n.props.fill ?? '') === `url(#${pattern?.props?.id})`));
-check('the pattern uses user-space units', pattern?.props?.patternUnits === 'userSpaceOnUse', pattern?.props?.patternUnits);
-check('the pattern tile matches the label size', Number(pattern?.props?.width) === 110 && Number(pattern?.props?.height) === 110, `${pattern?.props?.width}x${pattern?.props?.height}`);
-
-const labelArt = withCover.find((n) => n.type === 'circle' && String(n.props.fill ?? '').startsWith('url(#vr-label-art'));
-check('the artwork circle is the label size', labelArt !== undefined && Number(labelArt.props.r) === 55, `r=${labelArt?.props?.r}`);
+// The artwork is clipped by a clipPath expressed in the record's user space. A
+// pattern resolved against the wrong viewport and filled a single quadrant when
+// rendered outside the app, so the cheaper-looking approach was replaced.
+const clip = withCover.find((n) => n.type === 'clipPath');
+check('a clipPath wraps the artwork', clip !== undefined);
+check('the clipPath is referenced by the image', String(image?.props?.clipPath ?? '') === `url(#${clip?.props?.id})`, String(image?.props?.clipPath));
+check('the clipPath uses user-space units', clip?.props?.clipPathUnits === 'userSpaceOnUse', clip?.props?.clipPathUnits);
+const clipCircle = withCover.find((n) => n.type === 'circle' && n.props.cx === 0 && n.props.cy === 0 && n.props.r === 55);
+check('the clip is the label circle', clipCircle !== undefined, `r=${clipCircle?.props?.r}`);
+check('the artwork is drawn at the label size', Number(image?.props?.width) === 110 && Number(image?.props?.height) === 110, `${image?.props?.width}x${image?.props?.height}`);
 
 // --- 3. no cover falls back to the initial, never a hole ------------------
 const withoutCover = render('');
@@ -157,7 +159,7 @@ check('the initial is centred on the label', Number(fallbackText?.props?.x) === 
 
 // --- 4. the artwork lives inside the spinning group ----------------------
 const spinIndex = withCover.findIndex((n) => String(n.props?.className ?? '').includes('vr-disc-spin'));
-const artIndex = withCover.findIndex((n) => n.type === 'pattern');
+const artIndex = withCover.findIndex((n) => n.type === 'image');
 check('the artwork is declared after the spin group opens', artIndex > spinIndex, `spin@${spinIndex} pattern@${artIndex}`);
 check('the spinning group is still present', spinIndex !== -1);
 

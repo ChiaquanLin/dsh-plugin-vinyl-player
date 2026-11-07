@@ -5,10 +5,10 @@ node_modules/
 dist/
 *.tsbuildinfo
 
-# Test output. The committed deck-preview.svg is a README screenshot, so it is
-# re-included below; the suites overwrite it when they run.
+# Raw serialisation of the React tree, written by artifact-check for inspection.
+# It is not a valid standalone image, so it never belongs in the repository.
+# The README links docs/*.svg instead, which render-shot and render-diagram make.
 tools/*.svg
-!tools/deck-preview.svg
 
 # Logs
 *.log
@@ -26,3 +26,5 @@ Thumbs.db
 .env
 .env.*
 !.env.example
+
+tools/artifact-raw.svg
