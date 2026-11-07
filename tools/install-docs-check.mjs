@@ -30,7 +30,8 @@ check('the package is not private', pkg.private === undefined, String(pkg.privat
 check('the package has a publishable name', typeof pkg.name === 'string' && pkg.name.startsWith('dsh-plugin-'), pkg.name);
 check('the package declares a version', /^\d+\.\d+\.\d+$/.test(pkg.version), pkg.version);
 check('the package declares its licence', pkg.license === 'MIT', pkg.license);
-check('publishing is explicitly public', pkg.publishConfig?.access === 'public', pkg.publishConfig?.access);
+// No registry release: publish metadata would imply a package to fetch.
+check('the manifest carries no publish config', pkg.publishConfig === undefined, JSON.stringify(pkg.publishConfig));
 
 // A repository field is what makes `npm install github:…` resolvable and what npm
 // shows on the package page.
@@ -53,32 +54,9 @@ for (const name of required) {
   check(`the package ships ${name}`, present);
 }
 
-// `files` must cover those paths, or npm would leave them out of the tarball.
-// A pattern ending in `/*` covers its whole directory; `*.ext` covers that
-// extension anywhere in it.
-const covers = (name) => (pkg.files ?? []).some((pattern) => {
-  if (pattern === name) return true;
-  const dirPrefix = pattern.endsWith('/*') ? pattern.slice(0, -1) : null;
-  if (dirPrefix !== null) {
-    if (name.startsWith(dirPrefix)) return true;
-    // `tools/*.mjs` matches any .mjs directly inside tools/
-    return false;
-  }
-  if (pattern.includes('*.')) {
-    const [dir, ext] = pattern.split('*.');
-    const suffix = `.${ext}`;
-    if (!name.endsWith(suffix)) return false;
-    // The wildcard covers the directory itself, not deeper paths.
-    return name.startsWith(`${dir}`) && !name.slice(dir.length).includes('/');
-  }
-  return false;
-});
-for (const name of ['index.js', 'lib/client.js', 'cordis.patch.yml', 'locale/en.json']) {
-  check(`the files field covers ${name}`, covers(name), JSON.stringify(pkg.files));
-}
-
-// The suites ship too: `npm test` is how a user checks an install.
-check('the test suites ship with the package', covers('tools/layout-check.mjs'), JSON.stringify(pkg.files));
+// Every runtime file must exist on disk. There is no tarball filter any more, so
+// a missing file is simply a broken install.
+check('the package ships no tarball filter', pkg.files === undefined, JSON.stringify(pkg.files));
 
 // --- 3. the README documents all three paths ---------------------------
 check('the README has an Install section', /^## Install$/m.test(readme));
@@ -86,7 +64,8 @@ check('it documents asking an agent to install', /ask an agent to install/i.test
 check('it shows the conversational command', /安装 https:\/\/github\.com\/ChiaquanLin\/dsh-plugin-vinyl-player/.test(readme));
 check('it documents `dsh plugin add`', /dsh plugin add/.test(readme));
 check('it documents the GitHub spec', /github:ChiaquanLin\/dsh-plugin-vinyl-player/.test(readme));
-check('it documents the registry name', /dsh plugin add dsh-plugin-vinyl-player/.test(readme));
+// A registry install is not offered, so the README must not suggest one.
+check('it does not promise a registry install', !/dsh plugin add dsh-plugin-vinyl-player(?!\S)/.test(readme), 'no bare package-name install');
 check('it documents removing the plugin', /dsh plugin remove/.test(readme));
 
 // The old, wrong command must not reappear: `dsh plugin` forwards to pnpm, so there
@@ -94,12 +73,7 @@ check('it documents removing the plugin', /dsh plugin remove/.test(readme));
 check('it does not invent an install-bundle verb', !/dsh plugin install-bundle/.test(readme));
 
 // --- 4. publishing notes match reality ---------------------------------
-check('the publishing guide explains the npm path', /## Publishing to npm/.test(publishing), 'npm publish');
-check('it uses the topics endpoint, not a repo PATCH', /\/topics/.test(publishing));
-check('it no longer claims `gh repo edit` is the only route', /gh repo edit --add-topic.*does the same/.test(publishing) || !/^gh repo edit/m.test(publishing));
-
-// A publish guard means a failing build cannot be released.
-check('publishing runs the tests first', /npm test/.test(pkg.scripts?.prepublishOnly ?? ''), pkg.scripts?.prepublishOnly);
+check('the publishing guide does not describe a registry release', !/npm publish/.test(publishing), 'npm publish');
 
 // --- 5. the README's stated test count matches reality -----------------
 // A number in the README goes stale quietly. Count the suites `test` actually runs
@@ -115,9 +89,9 @@ check('the stated suite count matches package.json', Number(claimedSuites) === s
 // that has to run itself to count itself.
 check('the README states a check total', /\d+ checks/.test(readme), /(\d+) checks/.exec(readme)?.[1]);
 
-// --- 6. npm metadata is complete --------------------------------------
-check('the author is an object with a name', typeof pkg.author === 'object' && typeof pkg.author.name === 'string', JSON.stringify(pkg.author));
-check('a maintainer is declared', Array.isArray(pkg.maintainers) && pkg.maintainers.length > 0, JSON.stringify(pkg.maintainers));
+// --- 6. metadata is present, without release-only fields ----------------
+check('the package still has a description', typeof pkg.description === 'string' && pkg.description.length > 20);
+check('the package points at its repository', /ChiaquanLin\/dsh-plugin-vinyl-player/.test(pkg.repository?.url ?? ''), pkg.repository?.url);
 check('the package has zero runtime dependencies', Object.keys(pkg.dependencies ?? {}).length === 0, JSON.stringify(pkg.dependencies));
 check('keywords carry the discoverability topic', (pkg.keywords ?? []).includes('dsh-plugin'), JSON.stringify(pkg.keywords?.slice(0, 3)));
 

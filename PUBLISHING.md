@@ -59,8 +59,8 @@ audio-player
 web-ui
 ```
 
-The same list appears in `package.json` under `keywords`, which is what npm reads.
-Keep the two in sync: the first keyword there is `dsh-plugin` for the same reason.
+The same list appears in `package.json` under `keywords`, and the first entry is
+`dsh-plugin` for the same reason: it is what people search for.
 
 ## 4. Check the result
 
@@ -80,30 +80,3 @@ Keep the two in sync: the first keyword there is `dsh-plugin` for the same reaso
 
 
 ---
-
-## Publishing to npm
-
-The package is ready to publish: `private` is unset, `license` and `repository`
-are set, `publishConfig.access` is `public`, and `prepublishOnly` runs the full
-suite so a broken build cannot be published.
-
-```bash
-npm login
-npm publish
-```
-
-Once published, installing becomes:
-
-```bash
-dsh plugin add dsh-plugin-vinyl-player
-```
-
-Until then the registry has no such package, and users install from the repository
-instead:
-
-```bash
-dsh plugin add github:ChiaquanLin/dsh-plugin-vinyl-player
-```
-
-Both paths are verified: a scratch profile installed the GitHub spec with
-`dsh plugin add`, and the resulting bundle loaded its manifest and patch.

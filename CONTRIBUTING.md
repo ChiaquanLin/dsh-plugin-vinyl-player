@@ -6,16 +6,16 @@ changes reviewable.
 ## Before you change anything
 
 ```bash
-npm test
+node tools/count-checks.mjs
 ```
 
-319 checks across 14 suites. They run offline: React is stubbed and the components
+369 checks across 17 suites. They run offline: React is stubbed and the components
 are rendered into a plain object tree, so no browser is needed. Keep them green.
 
 The optional browser suites need Microsoft Edge and network access:
 
 ```bash
-npm run test:browser
+node tools/e2e-probe.mjs
 ```
 
 ## The invariants
@@ -50,7 +50,7 @@ Several past bugs came from breaking these, and each is pinned by a test:
 
 Put it in `tools/`, follow the existing shape (a `check(label, ok, detail)`
 helper, a count at the end, a non-zero exit on failure), and register it in
-`package.json` so `npm test` runs it.
+`package.json`'s `test` script so it runs with the rest.
 
 If a bug is only reproducible in a real media element, add a browser probe rather
 than extending a static suite — half the seek defects in this project were

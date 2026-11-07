@@ -18,7 +18,7 @@ jobs:
       # The static suites render the real components with a stub React and need
       # neither a browser nor network access, so they run anywhere.
       - name: Run the offline suite
-        run: npm test
+        run: npm test # every command is a plain `node tools/*.mjs` call
 
   syntax:
     name: syntax

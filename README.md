@@ -6,7 +6,6 @@
 
 Search for music · drop a record on the platter · keep listening while you work
 
-[![npm](https://img.shields.io/npm/v/dsh-plugin-vinyl-player?style=flat-square&color=cb3837)](https://www.npmjs.com/package/dsh-plugin-vinyl-player)
 [![MIT](https://img.shields.io/badge/licence-MIT-3da639?style=flat-square)](LICENSE)
 [![dsh-plugin](https://img.shields.io/badge/dsh--plugin-ready-4f8cff?style=flat-square)](https://github.com/topics/dsh-plugin)
 [![deps](https://img.shields.io/badge/dependencies-none-3da639?style=flat-square)](package.json)
@@ -77,7 +76,8 @@ track is already buffered.
 
 ## Install
 
-Three ways, simplest first.
+Two ways. Neither needs a registry package: this plugin is distributed from its
+repository.
 
 ### 1. Ask an agent to install it
 
@@ -87,18 +87,15 @@ In a DeepSeek Harness conversation, say:
 安装 https://github.com/ChiaquanLin/dsh-plugin-vinyl-player 插件
 ```
 
-The agent installs the bundle, reloads the panel, and the turntable appears in the
-sidebar. This is the intended path — you do not need a terminal.
+The agent installs the bundle and reloads the panel, and the turntable appears in
+the sidebar. This is the intended path — no terminal required.
 
 ### 2. Install with `dsh`
 
-`dsh plugin` forwards to the profile's package manager, so any spec pnpm accepts
-works:
+`dsh plugin` forwards to the profile's package manager, so it accepts a repository
+spec or a local path:
 
 ```bash
-# from the npm registry
-dsh plugin add dsh-plugin-vinyl-player
-
 # straight from the repository
 dsh plugin add github:ChiaquanLin/dsh-plugin-vinyl-player
 
@@ -107,35 +104,18 @@ git clone https://github.com/ChiaquanLin/dsh-plugin-vinyl-player
 dsh plugin add ./dsh-plugin-vinyl-player
 ```
 
-Add `--profile <name>` before `plugin` when the profile you want is not the
-default:
+Put `--profile <name>` before `plugin` when the target profile is not the default:
 
 ```bash
-dsh plugin --profile desktop add dsh-plugin-vinyl-player
+dsh plugin --profile desktop add github:ChiaquanLin/dsh-plugin-vinyl-player
 ```
 
-Check what a profile has:
+Check what a profile has, or remove the plugin again:
 
 ```bash
 dsh plugin --profile desktop list
+dsh plugin remove github:ChiaquanLin/dsh-plugin-vinyl-player
 ```
-
-### 3. Install from npm
-
-```bash
-dsh plugin add dsh-plugin-vinyl-player
-```
-
-The package ships the built bundle, its locale files, its icon, and its test
-suites, so nothing is compiled on your machine.
-
-To verify an install at any time:
-
-```bash
-cd node_modules/dsh-plugin-vinyl-player && npm test
-```
-
-Run that from your profile directory, which is where `dsh plugin` put it.
 
 ### Afterwards
 
@@ -146,11 +126,7 @@ Requirements: a DeepSeek Harness Web GUI profile, and a network path to
 `bilibili.com`. Node 20+ is only needed to run the tests.
 
 Installing into a profile affects every session in that profile, and the plugin
-survives a restart. To remove it:
-
-```bash
-dsh plugin remove dsh-plugin-vinyl-player
-```
+survives a restart.
 
 ## Using it
 
@@ -191,15 +167,19 @@ tools/*.mjs           Test suites
 ## Tests
 
 ```bash
-npm test              # 17 suites, 376 checks, no browser or network needed
-npm run test:browser  # optional: drives a real headless Edge
+node tools/count-checks.mjs   # run every suite, 17 suites / 369 checks
+node tools/e2e-probe.mjs      # optional: drives a real headless Edge
 ```
 
-The offline suites render the real components with a stub React and inspect the
-result, which is how the deck's geometry is verified — every disc is asserted to be
-a `<circle>`, the cabinet is asserted to contain its platter, and the tonearm's
-stylus is asserted to land where it should. The optional browser suites cover what
-static checks cannot see, such as how a real media element responds to a seek.
+There are no dependencies to install — the suites use only Node's standard
+library. The offline ones render the real components with a stub React and inspect
+the result, which is how the deck's geometry is verified: every disc is asserted to
+be a `<circle>`, the cabinet is asserted to contain its platter, and the tonearm's
+stylus is asserted to land where it should. The browser probes cover what static
+checks cannot see, such as how a real media element responds to a seek.
+
+`node tools/count-checks.mjs --write` updates the totals quoted in this file, so
+they cannot drift from the suites that produce them.
 
 ## Legal
 

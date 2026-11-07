@@ -9,45 +9,11 @@
     "./locale/*.json": "./locale/*.json",
     "./icon": "./icon.svg"
   },
-  "files": [
-    "index.js",
-    "lib/client.js",
-    "cordis.patch.yml",
-    "locale/*.json",
-    "icon.svg",
-    "README.md",
-    "LICENSE",
-    "LEGAL.md",
-    "SECURITY.md",
-    "docs/*.svg",
-    "tools/*.mjs",
-    "CONTRIBUTING.md"
-  ],
   "scripts": {
     "test": "node tools/render-shot.mjs && node tools/render-diagram.mjs && node tools/install-docs-check.mjs && node tools/buffer-check.mjs && node tools/unseekable-check.mjs && node tools/seekland-check.mjs && node tools/seekguard-check.mjs && node tools/seekapply-check.mjs && node tools/seek-check.mjs && node tools/label-check.mjs && node tools/cover-check.mjs && node tools/layout-check.mjs && node tools/round-check.mjs && node tools/artifact-check.mjs && node tools/arm-check.mjs && node tools/client-check.mjs && node tools/host-check.mjs",
-    "test:label": "node tools/label-check.mjs",
-    "test:layout": "node tools/layout-check.mjs",
-    "test:round": "node tools/round-check.mjs",
-    "test:artifact": "node tools/artifact-check.mjs",
-    "test:arm": "node tools/arm-check.mjs",
-    "test:client": "node tools/client-check.mjs",
-    "test:host": "node tools/host-check.mjs",
-    "test:cover": "node tools/cover-check.mjs",
-    "test:seek": "node tools/seek-check.mjs",
-    "test:seekguard": "node tools/seekguard-check.mjs",
-    "test:seekapply": "node tools/seekapply-check.mjs",
-    "test:seekland": "node tools/seekland-check.mjs",
-    "test:browser": "node tools/e2e-probe.mjs && node tools/store-probe.mjs && node tools/bar-probe.mjs",
-    "test:e2e": "node tools/e2e-probe.mjs",
-    "test:unseekable": "node tools/unseekable-check.mjs",
-    "test:blob": "node tools/blob-probe.mjs",
-    "test:buffer": "node tools/buffer-check.mjs",
-    "build:images": "node tools/render-shot.mjs && node tools/render-diagram.mjs",
-    "test:images": "node tools/render-shot.mjs && node tools/render-diagram.mjs",
-    "prepublishOnly": "npm test",
-    "test:install": "node tools/install-docs-check.mjs",
     "count": "node tools/count-checks.mjs",
-    "count:write": "node tools/count-checks.mjs --write"
+    "count:write": "node tools/count-checks.mjs --write",
+    "test:browser": "node tools/e2e-probe.mjs && node tools/store-probe.mjs && node tools/bar-probe.mjs"
   },
   "dsh": {
     "bundle": {
@@ -64,10 +30,6 @@
     }
   },
   "license": "MIT",
-  "author": {
-    "name": "ChiaquanLin",
-    "url": "https://github.com/ChiaquanLin"
-  },
   "keywords": [
     "dsh-plugin",
     "dsh",
@@ -90,13 +52,5 @@
   },
   "engines": {
     "node": ">=20"
-  },
-  "publishConfig": {
-    "access": "public"
-  },
-  "maintainers": [
-    {
-      "name": "alinn"
-    }
-  ]
+  }
 }

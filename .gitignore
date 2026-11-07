@@ -27,4 +27,11 @@ Thumbs.db
 .env.*
 !.env.example
 
+# Credentials. A .npmrc holds a registry token, and an interrupted run must never
+# be able to commit one. The plugin has no registry release, so nothing legitimate
+# creates this file.
+.npmrc
+*.pem
+*.key
+
 tools/artifact-raw.svg
