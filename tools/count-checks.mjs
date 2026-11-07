@@ -69,9 +69,12 @@ console.log(`\n${rows.length} suites, ${total} checks${failing.length ? `, ${fai
 if (write) {
   const readmePath = path.join(root, 'README.md');
   const readme = fs.readFileSync(readmePath, 'utf8');
+  // Two phrasings appear in the README: "N suites / M checks" in the Tests block
+  // and "N suites, M checks" in prose. Update both.
   const updated = readme
-    .replace(/\d+ suites, \d+ checks/, `${rows.length} suites, ${total} checks`)
-    .replace(/tests-\d+%20passing/, `tests-${total}%20passing`);
+    .replace(/\d+ suites\s*\/\s*\d+ checks/g, `${rows.length} suites / ${total} checks`)
+    .replace(/\d+ suites,\s*\d+ checks/g, `${rows.length} suites, ${total} checks`)
+    .replace(/tests-\d+%20passing/g, `tests-${total}%20passing`);
   if (updated === readme) {
     console.log('README already up to date');
   } else {

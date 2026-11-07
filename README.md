@@ -92,29 +92,27 @@ the sidebar. This is the intended path — no terminal required.
 
 ### 2. Install with `dsh`
 
-`dsh plugin` forwards to the profile's package manager, so it accepts a repository
-spec or a local path:
-
-```bash
-# straight from the repository
-dsh plugin add github:ChiaquanLin/dsh-plugin-vinyl-player
-
-# or from a local checkout
-git clone https://github.com/ChiaquanLin/dsh-plugin-vinyl-player
-dsh plugin add ./dsh-plugin-vinyl-player
-```
-
-Put `--profile <name>` before `plugin` when the target profile is not the default:
+`dsh plugin` forwards to the profile's package manager, and **`--profile` is
+required**, placed between `plugin` and the subcommand:
 
 ```bash
 dsh plugin --profile desktop add github:ChiaquanLin/dsh-plugin-vinyl-player
 ```
 
-Check what a profile has, or remove the plugin again:
+Use the profile you actually run — `desktop` for the desktop app, `web` for
+`dsh web`. To install from a local checkout instead:
+
+```bash
+git clone https://github.com/ChiaquanLin/dsh-plugin-vinyl-player
+dsh plugin --profile desktop add ./dsh-plugin-vinyl-player
+```
+
+Adding the dependency also registers the bundle, so no separate enable step is
+needed. Check or undo it with:
 
 ```bash
 dsh plugin --profile desktop list
-dsh plugin remove github:ChiaquanLin/dsh-plugin-vinyl-player
+dsh plugin --profile desktop remove dsh-plugin-vinyl-player
 ```
 
 ### Afterwards
@@ -167,7 +165,7 @@ tools/*.mjs           Test suites
 ## Tests
 
 ```bash
-node tools/count-checks.mjs   # run every suite, 17 suites / 369 checks
+node tools/count-checks.mjs   # run every suite, 17 suites / 370 checks
 node tools/e2e-probe.mjs      # optional: drives a real headless Edge
 ```
 

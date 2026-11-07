@@ -62,11 +62,24 @@ check('the package ships no tarball filter', pkg.files === undefined, JSON.strin
 check('the README has an Install section', /^## Install$/m.test(readme));
 check('it documents asking an agent to install', /ask an agent to install/i.test(readme));
 check('it shows the conversational command', /安装 https:\/\/github\.com\/ChiaquanLin\/dsh-plugin-vinyl-player/.test(readme));
-check('it documents `dsh plugin add`', /dsh plugin add/.test(readme));
+
+// `--profile` is a required option on `dsh plugin`, and it must sit between
+// `plugin` and the subcommand. A command without it fails with
+// "required option '--profile <name>' not specified", which is exactly what a
+// reader would hit.
+check('every documented dsh plugin command names a profile', (() => {
+  const commands = [...readme.matchAll(/dsh plugin ([^\n`]*)/g)].map((m) => m[1]);
+  if (commands.length === 0) return false;
+  return commands.every((rest) => /^--profile \S+/.test(rest));
+})(), JSON.stringify([...readme.matchAll(/dsh plugin ([^\n`]*)/g)].map((m) => m[1].slice(0, 40))));
+
+// The flag belongs before the subcommand; `add --profile` would be parsed as an
+// argument to add.
+check('the profile flag precedes the subcommand', !/dsh plugin add[^\n]*--profile/.test(readme));
 check('it documents the GitHub spec', /github:ChiaquanLin\/dsh-plugin-vinyl-player/.test(readme));
 // A registry install is not offered, so the README must not suggest one.
 check('it does not promise a registry install', !/dsh plugin add dsh-plugin-vinyl-player(?!\S)/.test(readme), 'no bare package-name install');
-check('it documents removing the plugin', /dsh plugin remove/.test(readme));
+check('it documents removing the plugin', /dsh plugin --profile \S+ remove/.test(readme));
 
 // The old, wrong command must not reappear: `dsh plugin` forwards to pnpm, so there
 // is no `install-bundle` verb.
