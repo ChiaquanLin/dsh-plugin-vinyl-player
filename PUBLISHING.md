@@ -32,8 +32,16 @@ Topics are what make the plugin discoverable: `dsh-plugin` is the topic the
 Harness ecosystem is searched by, and it **must** be present.
 
 ```bash
-gh repo edit ChiaquanLin/dsh-plugin-vinyl-player --add-topic dsh-plugin
+# topics have their own endpoint; PATCH /repos/… silently ignores the field
+curl -X PUT \
+  -H "Authorization: Bearer $GITHUB_TOKEN" \
+  -H "Accept: application/vnd.github+json" \
+  -H "Content-Type: application/json" \
+  -d '{"names":["dsh-plugin","dsh","deepseek-harness","cordis","cordis-plugin","bilibili","music","vinyl","turntable","audio-player","web-ui"]}' \
+  https://api.github.com/repos/ChiaquanLin/dsh-plugin-vinyl-player/topics
 ```
+
+(`gh repo edit --add-topic` does the same thing when the GitHub CLI is installed.)
 
 Or set them in the browser under the repository's gear icon next to "About":
 
@@ -69,3 +77,33 @@ Keep the two in sync: the first keyword there is `dsh-plugin` for the same reaso
 - The licence is MIT, and the disclaimer in the README is deliberately prominent.
   Do not remove it: the plugin reads from endpoints it does not own, and that notice
   is what tells a reader what they are taking on.
+
+
+---
+
+## Publishing to npm
+
+The package is ready to publish: `private` is unset, `license` and `repository`
+are set, `publishConfig.access` is `public`, and `prepublishOnly` runs the full
+suite so a broken build cannot be published.
+
+```bash
+npm login
+npm publish
+```
+
+Once published, installing becomes:
+
+```bash
+dsh plugin add dsh-plugin-vinyl-player
+```
+
+Until then the registry has no such package, and users install from the repository
+instead:
+
+```bash
+dsh plugin add github:ChiaquanLin/dsh-plugin-vinyl-player
+```
+
+Both paths are verified: a scratch profile installed the GitHub spec with
+`dsh plugin add`, and the resulting bundle loaded its manifest and patch.

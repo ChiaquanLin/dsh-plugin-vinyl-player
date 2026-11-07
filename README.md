@@ -76,15 +76,80 @@ track is already buffered.
 
 ## Install
 
-```bash
-dsh plugin install-bundle ./vinyl-room
+Three ways, simplest first.
+
+### 1. Ask an agent to install it
+
+In a DeepSeek Harness conversation, say:
+
+```
+安装 https://github.com/ChiaquanLin/dsh-plugin-vinyl-player 插件
 ```
 
-Then reload the Web GUI. A **黑胶唱片机 / Vinyl player** entry appears in the
-sidebar; open it and you have a turntable.
+The agent installs the bundle, reloads the panel, and the turntable appears in the
+sidebar. This is the intended path — you do not need a terminal.
+
+### 2. Install with `dsh`
+
+`dsh plugin` forwards to the profile's package manager, so any spec pnpm accepts
+works:
+
+```bash
+# from the npm registry
+dsh plugin add dsh-plugin-vinyl-player
+
+# straight from the repository
+dsh plugin add github:ChiaquanLin/dsh-plugin-vinyl-player
+
+# or from a local checkout
+git clone https://github.com/ChiaquanLin/dsh-plugin-vinyl-player
+dsh plugin add ./dsh-plugin-vinyl-player
+```
+
+Add `--profile <name>` before `plugin` when the profile you want is not the
+default:
+
+```bash
+dsh plugin --profile desktop add dsh-plugin-vinyl-player
+```
+
+Check what a profile has:
+
+```bash
+dsh plugin --profile desktop list
+```
+
+### 3. Install from npm
+
+```bash
+dsh plugin add dsh-plugin-vinyl-player
+```
+
+The package ships the built bundle, its locale files, its icon, and its test
+suites, so nothing is compiled on your machine.
+
+To verify an install at any time:
+
+```bash
+cd node_modules/dsh-plugin-vinyl-player && npm test
+```
+
+Run that from your profile directory, which is where `dsh plugin` put it.
+
+### Afterwards
+
+Reload the Web GUI. A **黑胶唱片机 / Vinyl player** entry appears in the sidebar;
+open it and you have a turntable.
 
 Requirements: a DeepSeek Harness Web GUI profile, and a network path to
-`bilibili.com`.
+`bilibili.com`. Node 20+ is only needed to run the tests.
+
+Installing into a profile affects every session in that profile, and the plugin
+survives a restart. To remove it:
+
+```bash
+dsh plugin remove dsh-plugin-vinyl-player
+```
 
 ## Using it
 
