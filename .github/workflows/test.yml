@@ -1,0 +1,50 @@
+name: test
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  static:
+    name: static suites
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      # The static suites render the real components with a stub React and need
+      # neither a browser nor network access, so they run anywhere.
+      - name: Run the offline suite
+        run: npm test
+
+  syntax:
+    name: syntax
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Check both halves parse
+        run: |
+          node --check index.js
+          node --check lib/client.js
+      - name: Check JSON is valid
+        run: |
+          node -e "for (const f of ['package.json','locale/en.json','locale/zh.json']) JSON.parse(require('fs').readFileSync(f,'utf8'))"
+      - name: Check the locale dictionaries match
+        run: |
+          node -e "
+            const en = Object.keys(JSON.parse(require('fs').readFileSync('locale/en.json','utf8'))).sort();
+            const zh = Object.keys(JSON.parse(require('fs').readFileSync('locale/zh.json','utf8'))).sort();
+            const missing = en.filter(k => !zh.includes(k));
+            const extra = zh.filter(k => !en.includes(k));
+            if (missing.length || extra.length) {
+              console.error('locale key mismatch', { missing, extra });
+              process.exit(1);
+            }
+            console.log('locale keys match:', en.length);
+          "

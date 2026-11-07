@@ -1,0 +1,119 @@
+/**
+ * Render the deck to a standalone .svg on disk and measure its discs.
+ *
+ * The point is to look at the artifact, not just the source: this serializes the
+ * exact element tree the component returns, then parses the result and checks
+ * that the record body is a <circle> with a single radius and no ancestor that
+ * scales one axis differently from the other on that element.
+ */
+import fs from 'node:fs';
+
+const source = fs.readFileSync(new URL('../lib/client.js', import.meta.url), 'utf8');
+
+const React = {
+  createElement: (type, props, ...children) => ({ type, props: props ?? {}, children: children.flat(Infinity) }),
+  Fragment: Symbol('Fragment'),
+  useState: (initial) => [typeof initial === 'function' ? initial() : initial, () => {}],
+  useEffect: () => {},
+  useMemo: (factory) => factory(),
+  useCallback: (fn) => fn,
+  useRef: (initial) => ({ current: initial }),
+  useSyncExternalStore: (subscribe, read) => read(),
+};
+const registry = new Map();
+globalThis.window = {
+  __ModuleLoader__: { load: ({ id, factory }) => registry.set(id, factory) },
+  location: { origin: 'http://127.0.0.1:1' },
+  localStorage: { getItem: () => null, setItem: () => {}, removeItem: () => {} },
+};
+globalThis.fetch = async () => new Response('{"ok":true}', { headers: { 'content-type': 'application/json' } });
+new Function(source)();
+const plugin = registry.get('dsh-plugin-vinyl-player')((name) => {
+  if (name === 'react') return React;
+  throw new Error(`unexpected require(${name})`);
+});
+
+const deck = plugin.__test_Turntable({
+  title: 'Test record', cover: '', armed: true, playing: false, dropActive: false,
+  speed: 33, volume: 0.8, muted: false,
+  playLabel: 'Play', pauseLabel: 'Pause', emptyLabel: 'Empty',
+  armLabel: 'Drag the arm', speedLabel: 'Speed', volumeLabel: 'Volume',
+  onToggle() {}, onEngage() {}, onDrop() {}, onDropActive() {}, onSpeed() {}, onVolume() {}, onMute() {},
+});
+
+// --- serialize the tree to SVG markup --------------------------------------
+const VOIDLESS = new Set(['circle', 'rect', 'path', 'ellipse', 'line', 'polygon', 'polyline', 'image', 'stop', 'feGaussianBlur', 'feTurbulence', 'feColorMatrix']);
+const escapeAttr = (value) => String(value).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;');
+const camelToKebab = (name) => name.replace(/[A-Z]/g, (m) => `-${m.toLowerCase()}`);
+
+function serialize(node) {
+  if (node === null || node === undefined) return '';
+  if (Array.isArray(node)) return node.map(serialize).join('');
+  if (typeof node === 'string' || typeof node === 'number') return String(node);
+  if (typeof node !== 'object') return '';
+  if (typeof node.type === 'function') return serialize(node.type(node.props));
+
+  const { type, props, children } = node;
+  // React prop names that differ from SVG attribute names.
+  const ATTR_ALIASES = { className: 'class', clipPath: 'clip-path', clipPathUnits: 'clipPathUnits', strokeWidth: 'stroke-width', strokeOpacity: 'stroke-opacity', strokeDasharray: 'stroke-dasharray', strokeLinecap: 'stroke-linecap', fillOpacity: 'fill-opacity', stopColor: 'stop-color', stopOpacity: 'stop-opacity', preserveAspectRatio: 'preserveAspectRatio', viewBox: 'viewBox', textAnchor: 'text-anchor', fontSize: 'font-size', fontWeight: 'font-weight', letterSpacing: 'letter-spacing', baseFrequency: 'baseFrequency', numOctaves: 'numOctaves', stdDeviation: 'stdDeviation', feColorMatrix: 'feColorMatrix' };
+  const attrs = [];
+  for (const [key, value] of Object.entries(props)) {
+    if (value === null || value === undefined || value === false) continue;
+    if (key === 'children' || key === 'key' || key === 'ref') continue;
+    if (typeof value === 'function' || typeof value === 'object') continue;
+    const name = ATTR_ALIASES[key] ?? (key.includes('-') ? key : camelToKebab(key));
+    attrs.push(`${name}="${escapeAttr(value)}"`);
+  }
+  const open = `<${type}${attrs.length ? ' ' + attrs.join(' ') : ''}`;
+  const body = serialize(children);
+  if (VOIDLESS.has(type) && body === '') return `${open}/>`;
+  return `${open}>${body}</${type}>`;
+}
+
+const markup = serialize(deck);
+const outPath = new URL('./deck-preview.svg', import.meta.url);
+fs.writeFileSync(outPath, markup, 'utf8');
+
+console.log('wrote', outPath.pathname, `(${markup.length} bytes)`);
+
+// --- measure the artifact --------------------------------------------------
+const checks = [];
+const check = (label, condition, detail) => {
+  checks.push({ label, condition: Boolean(condition) });
+  console.log(`${condition ? 'PASS' : 'FAIL'}  ${label}${detail === undefined ? '' : '  ' + detail}`);
+};
+
+check('the artifact is SVG markup', markup.startsWith('<div') || markup.includes('<svg'));
+
+// Pull every circle and its radius; a distorted disc would carry rx/ry instead.
+const circles = [...markup.matchAll(/<circle\b([^>]*)\/?>/g)].map((m) => m[1]);
+check('the artifact contains many circles', circles.length >= 20, `${circles.length}`);
+const withR = circles.filter((attrs) => /\br="/.test(attrs));
+check('every circle declares a single radius r', withR.length === circles.length, `${withR.length}/${circles.length}`);
+const withEllipseRadii = circles.filter((attrs) => /\brx="/.test(attrs) || /\bry="/.test(attrs));
+check('no circle carries ellipse radii', withEllipseRadii.length === 0, `${withEllipseRadii.length}`);
+
+const bigR = withR
+  .map((attrs) => Number((attrs.match(/\br="([^"]+)"/) ?? [])[1]))
+  .filter((r) => Number.isFinite(r) && r >= 140);
+check('the record body is a large circle', bigR.length >= 1, `radii: ${bigR.join(', ')}`);
+
+// No circle may be scaled by its own transform, and this front-view deck applies
+// no perspective projection at all, so every disc stays a true circle.
+const scaledCircles = circles.filter((attrs) => /transform="[^"]*scale\(/.test(attrs));
+check('no circle squashes itself with a scale', scaledCircles.length === 0, `${scaledCircles.length}`);
+
+const groups = [...markup.matchAll(/<g\b([^>]*)>/g)].map((m) => m[1]);
+const projected = groups.filter((attrs) => /scale\([^)]*,\s*0?\.\d+\)/.test(attrs));
+check('the artifact applies no perspective projection (front view)', projected.length === 0, `${projected.length} group(s)`);
+
+// The spin animation is a pure rotation about the element's own fill box, so the
+// disc turns in place instead of orbiting a canvas corner.
+check('the spin is a rotation animation', /class="vr-disc-spin/.test(markup));
+const cssText = source.slice(source.indexOf('const STYLES = `'), source.indexOf('`;', source.indexOf('prefers-reduced-motion')));
+check('the spin keyframes only rotate', /@keyframes vr-spin\{from\{transform:rotate\(0\)\}to\{transform:rotate\(360deg\)\}\}/.test(cssText));
+check('the spin element pins its origin to its own box', /\.vr-disc-spin\{transform-box:fill-box;transform-origin:center/.test(cssText), cssText.match(/\.vr-disc-spin\{[^}]*\}/)?.[0]);
+
+const failed = checks.filter((entry) => !entry.condition);
+console.log(`\n${checks.length - failed.length}/${checks.length} artifact checks passed`);
+process.exit(failed.length === 0 ? 0 : 1);

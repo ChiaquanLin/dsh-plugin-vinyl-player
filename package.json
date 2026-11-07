@@ -1,0 +1,80 @@
+{
+  "name": "dsh-plugin-vinyl-player",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "A cartoon vinyl record player for Bilibili audio inside the DeepSeek Harness Web GUI: search, shelve, and spin records while the music plays in the background.",
+  "exports": {
+    ".": "./index.js",
+    "./client": "./lib/client.js",
+    "./locale/*.json": "./locale/*.json",
+    "./icon": "./icon.svg"
+  },
+  "files": [
+    "index.js",
+    "lib/client.js",
+    "cordis.patch.yml",
+    "locale/*.json",
+    "icon.svg",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "test": "node tools/buffer-check.mjs && node tools/unseekable-check.mjs && node tools/seekland-check.mjs && node tools/seekguard-check.mjs && node tools/seekapply-check.mjs && node tools/seek-check.mjs && node tools/label-check.mjs && node tools/cover-check.mjs && node tools/layout-check.mjs && node tools/round-check.mjs && node tools/artifact-check.mjs && node tools/arm-check.mjs && node tools/client-check.mjs && node tools/host-check.mjs",
+    "test:label": "node tools/label-check.mjs",
+    "test:layout": "node tools/layout-check.mjs",
+    "test:round": "node tools/round-check.mjs",
+    "test:artifact": "node tools/artifact-check.mjs",
+    "test:arm": "node tools/arm-check.mjs",
+    "test:client": "node tools/client-check.mjs",
+    "test:host": "node tools/host-check.mjs",
+    "test:cover": "node tools/cover-check.mjs",
+    "test:seek": "node tools/seek-check.mjs",
+    "test:seekguard": "node tools/seekguard-check.mjs",
+    "test:seekapply": "node tools/seekapply-check.mjs",
+    "test:seekland": "node tools/seekland-check.mjs",
+    "test:browser": "node tools/e2e-probe.mjs && node tools/store-probe.mjs && node tools/bar-probe.mjs",
+    "test:e2e": "node tools/e2e-probe.mjs",
+    "test:unseekable": "node tools/unseekable-check.mjs",
+    "test:blob": "node tools/blob-probe.mjs",
+    "test:buffer": "node tools/buffer-check.mjs"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "platform": "web",
+      "immediately": true,
+      "inject": [
+        "@deepseek-ai/dsh-client-locale",
+        "@deepseek-ai/dsh-client-ui-layout",
+        "@deepseek-ai/dsh-client-ui-slots"
+      ]
+    }
+  },
+  "license": "MIT",
+  "author": "Vinyl player contributors",
+  "keywords": [
+    "dsh-plugin",
+    "dsh",
+    "deepseek-harness",
+    "cordis",
+    "vinyl",
+    "turntable",
+    "bilibili",
+    "music",
+    "audio",
+    "web-ui"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Chiaquan/dsh-plugin-vinyl-player.git"
+  },
+  "homepage": "https://github.com/Chiaquan/dsh-plugin-vinyl-player#readme",
+  "bugs": {
+    "url": "https://github.com/Chiaquan/dsh-plugin-vinyl-player/issues"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

@@ -1,0 +1,28 @@
+# Dependencies
+node_modules/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Test output. The committed deck-preview.svg is a README screenshot, so it is
+# re-included below; the suites overwrite it when they run.
+tools/*.svg
+!tools/deck-preview.svg
+
+# Logs
+*.log
+npm-debug.log*
+pnpm-debug.log*
+
+# Editor and OS noise
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+
+# Local environment
+.env
+.env.*
+!.env.example
