@@ -45,7 +45,9 @@
     "build:images": "node tools/render-shot.mjs && node tools/render-diagram.mjs",
     "test:images": "node tools/render-shot.mjs && node tools/render-diagram.mjs",
     "prepublishOnly": "npm test",
-    "test:install": "node tools/install-docs-check.mjs"
+    "test:install": "node tools/install-docs-check.mjs",
+    "count": "node tools/count-checks.mjs",
+    "count:write": "node tools/count-checks.mjs --write"
   },
   "dsh": {
     "bundle": {
@@ -62,7 +64,10 @@
     }
   },
   "license": "MIT",
-  "author": "Vinyl player contributors",
+  "author": {
+    "name": "ChiaquanLin",
+    "url": "https://github.com/ChiaquanLin"
+  },
   "keywords": [
     "dsh-plugin",
     "dsh",
@@ -88,5 +93,10 @@
   },
   "publishConfig": {
     "access": "public"
-  }
+  },
+  "maintainers": [
+    {
+      "name": "alinn"
+    }
+  ]
 }

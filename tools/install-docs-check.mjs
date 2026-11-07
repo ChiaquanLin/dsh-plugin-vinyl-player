@@ -101,6 +101,26 @@ check('it no longer claims `gh repo edit` is the only route', /gh repo edit --ad
 // A publish guard means a failing build cannot be released.
 check('publishing runs the tests first', /npm test/.test(pkg.scripts?.prepublishOnly ?? ''), pkg.scripts?.prepublishOnly);
 
+// --- 5. the README's stated test count matches reality -----------------
+// A number in the README goes stale quietly. Count the suites `test` actually runs
+// and compare it with what the README claims.
+const suiteCommands = (pkg.scripts?.test ?? '').split('&&').map((part) => part.trim()).filter(Boolean);
+const suiteCount = suiteCommands.length;
+const claimedSuites = /(\d+) suites/.exec(readme)?.[1];
+check('the README states the suite count', claimedSuites !== undefined, `${claimedSuites} vs ${suiteCount}`);
+check('the stated suite count matches package.json', Number(claimedSuites) === suiteCount, `README says ${claimedSuites}, test runs ${suiteCount}`);
+
+// The check total in the README is maintained by tools/count-cycle.mjs, which
+// runs the whole tree and rewrites it. Keeping that out of here avoids a suite
+// that has to run itself to count itself.
+check('the README states a check total', /\d+ checks/.test(readme), /(\d+) checks/.exec(readme)?.[1]);
+
+// --- 6. npm metadata is complete --------------------------------------
+check('the author is an object with a name', typeof pkg.author === 'object' && typeof pkg.author.name === 'string', JSON.stringify(pkg.author));
+check('a maintainer is declared', Array.isArray(pkg.maintainers) && pkg.maintainers.length > 0, JSON.stringify(pkg.maintainers));
+check('the package has zero runtime dependencies', Object.keys(pkg.dependencies ?? {}).length === 0, JSON.stringify(pkg.dependencies));
+check('keywords carry the discoverability topic', (pkg.keywords ?? []).includes('dsh-plugin'), JSON.stringify(pkg.keywords?.slice(0, 3)));
+
 const failed = checks.filter((ok) => !ok).length;
 console.log(`\n${checks.length - failed}/${checks.length} install-docs checks passed`);
 process.exit(failed === 0 ? 0 : 1);

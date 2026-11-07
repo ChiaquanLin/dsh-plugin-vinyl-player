@@ -6,9 +6,10 @@
 
 Search for music · drop a record on the platter · keep listening while you work
 
+[![npm](https://img.shields.io/npm/v/dsh-plugin-vinyl-player?style=flat-square&color=cb3837)](https://www.npmjs.com/package/dsh-plugin-vinyl-player)
 [![MIT](https://img.shields.io/badge/licence-MIT-3da639?style=flat-square)](LICENSE)
 [![dsh-plugin](https://img.shields.io/badge/dsh--plugin-ready-4f8cff?style=flat-square)](https://github.com/topics/dsh-plugin)
-[![tests](https://img.shields.io/badge/tests-319%20passing-3da639?style=flat-square)](#tests)
+[![deps](https://img.shields.io/badge/dependencies-none-3da639?style=flat-square)](package.json)
 
 <img src="docs/deck.svg" alt="The vinyl player panel: a cartoon turntable with a record on the platter, a wooden cabinet, a speed selector and a volume knob" width="560">
 
@@ -190,7 +191,7 @@ tools/*.mjs           Test suites
 ## Tests
 
 ```bash
-npm test              # 14 suites, 319 checks, no browser or network needed
+npm test              # 17 suites, 376 checks, no browser or network needed
 npm run test:browser  # optional: drives a real headless Edge
 ```
 
