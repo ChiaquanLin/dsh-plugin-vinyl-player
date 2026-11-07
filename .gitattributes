@@ -1,0 +1,17 @@
+# Normalise line endings: the repository stores LF, and checkouts on Windows get
+# whatever the platform prefers. Without this, every commit rewrites the whole
+# tree on a Windows machine.
+* text=auto eol=lf
+
+# These must keep their exact bytes.
+*.svg text
+*.mjs text
+*.js text
+*.json text
+*.yml text
+*.md text
+
+# Binary assets, if any are ever added.
+*.png binary
+*.jpg binary
+*.woff2 binary
