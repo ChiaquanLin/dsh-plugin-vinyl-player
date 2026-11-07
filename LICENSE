@@ -1,6 +1,6 @@
 MIT License
 
-Copyright (c) 2026 Vinyl player contributors
+Copyright (c) 2026 ChiaquanLin
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
@@ -19,19 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-Additional notice
-
-This software is an unofficial client that interoperates with Bilibili's public
-web endpoints. It is not affiliated with, endorsed by, or sponsored by Bilibili.
-
-The software contains no audio, video, or artwork. All media is fetched at
-runtime from third-party servers and is not distributed with, or sublicensed by,
-this project. The MIT grant above covers this software only; it grants no rights
-to any third-party content, and it does not exempt any user from complying with
-Bilibili's terms of service or with applicable copyright law.
-
-Use of this software is at your own risk. The authors accept no liability for
-service disruption, account action, or misuse by third parties.

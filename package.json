@@ -16,7 +16,9 @@
     "locale/*.json",
     "icon.svg",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "LEGAL.md",
+    "SECURITY.md"
   ],
   "scripts": {
     "test": "node tools/buffer-check.mjs && node tools/unseekable-check.mjs && node tools/seekland-check.mjs && node tools/seekguard-check.mjs && node tools/seekapply-check.mjs && node tools/seek-check.mjs && node tools/label-check.mjs && node tools/cover-check.mjs && node tools/layout-check.mjs && node tools/round-check.mjs && node tools/artifact-check.mjs && node tools/arm-check.mjs && node tools/client-check.mjs && node tools/host-check.mjs",
@@ -68,11 +70,11 @@
   ],
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Chiaquan/dsh-plugin-vinyl-player.git"
+    "url": "git+https://github.com/ChiaquanLin/dsh-plugin-vinyl-player.git"
   },
-  "homepage": "https://github.com/Chiaquan/dsh-plugin-vinyl-player#readme",
+  "homepage": "https://github.com/ChiaquanLin/dsh-plugin-vinyl-player#readme",
   "bugs": {
-    "url": "https://github.com/Chiaquan/dsh-plugin-vinyl-player/issues"
+    "url": "https://github.com/ChiaquanLin/dsh-plugin-vinyl-player/issues"
   },
   "engines": {
     "node": ">=20"

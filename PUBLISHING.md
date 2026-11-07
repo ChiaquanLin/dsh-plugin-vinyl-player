@@ -1,15 +1,15 @@
-# Publishing this repository
+﻿# Publishing this repository
 
 The repository is already initialised and committed. Two steps remain: create the
 empty repository on GitHub, then push to it.
 
 ## 1. Create the repository
 
-Create an **empty** repository — no README, no `.gitignore`, no licence file. This
+Create an **empty** repository 鈥?no README, no `.gitignore`, no licence file. This
 project already has all three, and an initialised remote will conflict on the first
 push.
 
-- Owner: `Chiaquan`
+- Owner: `ChiaquanLin`
 - Name: `dsh-plugin-vinyl-player`
 - Visibility: public
 - Do **not** tick "Add a README file"
@@ -18,12 +18,12 @@ push.
 
 ```bash
 cd E:/dsh/vinyl-room
-git remote add origin https://github.com/Chiaquan/dsh-plugin-vinyl-player.git
+git remote add origin https://github.com/ChiaquanLin/dsh-plugin-vinyl-player.git
 git push -u origin main
 ```
 
 If Git asks for credentials, use a personal access token as the password
-(Settings → Developer settings → Personal access tokens → Fine-grained tokens),
+(Settings 鈫?Developer settings 鈫?Personal access tokens 鈫?Fine-grained tokens),
 scoped to this one repository with **Contents: read and write**.
 
 ## 3. Set the repository topics
@@ -32,7 +32,7 @@ Topics are what make the plugin discoverable: `dsh-plugin` is the topic the
 Harness ecosystem is searched by, and it **must** be present.
 
 ```bash
-gh repo edit Chiaquan/dsh-plugin-vinyl-player --add-topic dsh-plugin
+gh repo edit ChiaquanLin/dsh-plugin-vinyl-player --add-topic dsh-plugin
 ```
 
 Or set them in the browser under the repository's gear icon next to "About":
@@ -64,7 +64,7 @@ Keep the two in sync: the first keyword there is `dsh-plugin` for the same reaso
 
 ## Notes
 
-- `tools/deck-preview.svg` is committed on purpose — it is the README image. The
+- `tools/deck-preview.svg` is committed on purpose 鈥?it is the README image. The
   test suites overwrite it when they run, so re-commit it if the deck changes.
 - The licence is MIT, and the disclaimer in the README is deliberately prominent.
   Do not remove it: the plugin reads from endpoints it does not own, and that notice

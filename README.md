@@ -301,7 +301,8 @@ and are used here only to describe what this plugin interoperates with.
 ## Licence
 
 Released under the [MIT Licence](LICENSE). The disclaimer above describes how this
-project is meant to be used; it is not a limitation on the licence grant.
+project is meant to be used; it is not a limitation on the licence grant. The
+non-licence legal notice is kept separately in [LEGAL.md](LEGAL.md).
 
 ## Contributing
 
