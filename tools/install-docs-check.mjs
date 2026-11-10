@@ -17,6 +17,8 @@ const read = (name) => fs.readFileSync(new URL(name, root), 'utf8');
 
 const pkg = JSON.parse(read('package.json'));
 const readme = read('README.md');
+// The primary README is Chinese; an English translation sits beside it.
+const readmeEn = fs.readFileSync(new URL('README.en.md', root), 'utf8');
 const publishing = read('PUBLISHING.md');
 
 const checks = [];
@@ -59,8 +61,23 @@ for (const name of required) {
 check('the package ships no tarball filter', pkg.files === undefined, JSON.stringify(pkg.files));
 
 // --- 3. the README documents all three paths ---------------------------
-check('the README has an Install section', /^## Install$/m.test(readme));
-check('it documents asking an agent to install', /ask an agent to install/i.test(readme));
+check('the README has an install section', /^## 安装$/m.test(readme));
+
+// --- language navigation ---------------------------------------------------
+check('the primary README is Chinese', /^# 黑胶唱片机$/m.test(readme), /^# (.+)$/m.exec(readme)?.[1]);
+check('it links to the English translation', /\[English\]\(README\.en\.md\)/.test(readme));
+check('the English translation links back', /\[简体中文\]\(README\.md\)/.test(readmeEn));
+check('Chinese is presented first', (() => {
+  const i = readme.indexOf('简体中文');
+  const j = readme.indexOf('[English]');
+  return i !== -1 && j !== -1 && i < j;
+})(), 'zh label precedes the en link');
+check('the translation has the same section count', (() => {
+  const zh = [...readme.matchAll(/^## (.+)$/gm)].length;
+  const en = [...readmeEn.matchAll(/^## (.+)$/gm)].length;
+  return zh > 0 && zh === en;
+})(), 'each README has the same number of sections');
+check('it documents asking an agent to install', /让智能体帮你装/.test(readme));
 check('it shows the conversational command', /安装 https:\/\/github\.com\/ChiaquanLin\/dsh-plugin-vinyl-player/.test(readme));
 
 // `--profile` is a required option on `dsh plugin`, and it must sit between
@@ -93,14 +110,14 @@ check('the publishing guide does not describe a registry release', !/npm publish
 // and compare it with what the README claims.
 const suiteCommands = (pkg.scripts?.test ?? '').split('&&').map((part) => part.trim()).filter(Boolean);
 const suiteCount = suiteCommands.length;
-const claimedSuites = /(\d+) suites/.exec(readme)?.[1];
+const claimedSuites = /(\d+) 个套件/.exec(readme)?.[1];
 check('the README states the suite count', claimedSuites !== undefined, `${claimedSuites} vs ${suiteCount}`);
 check('the stated suite count matches package.json', Number(claimedSuites) === suiteCount, `README says ${claimedSuites}, test runs ${suiteCount}`);
 
 // The check total in the README is maintained by tools/count-cycle.mjs, which
 // runs the whole tree and rewrites it. Keeping that out of here avoids a suite
 // that has to run itself to count itself.
-check('the README states a check total', /\d+ checks/.test(readme), /(\d+) checks/.exec(readme)?.[1]);
+check('the README states a check total', /\d+ 项检查/.test(readme), /(\d+) 项检查/.exec(readme)?.[1]);
 
 // --- 6. metadata is present, without release-only fields ----------------
 check('the package still has a description', typeof pkg.description === 'string' && pkg.description.length > 20);

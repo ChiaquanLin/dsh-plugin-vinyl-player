@@ -67,19 +67,24 @@ const failing = rows.filter((row) => row.failed);
 console.log(`\n${rows.length} suites, ${total} checks${failing.length ? `, ${failing.length} failing` : ', all passing'}`);
 
 if (write) {
-  const readmePath = path.join(root, 'README.md');
-  const readme = fs.readFileSync(readmePath, 'utf8');
-  // Two phrasings appear in the README: "N suites / M checks" in the Tests block
-  // and "N suites, M checks" in prose. Update both.
-  const updated = readme
-    .replace(/\d+ suites\s*\/\s*\d+ checks/g, `${rows.length} suites / ${total} checks`)
-    .replace(/\d+ suites,\s*\d+ checks/g, `${rows.length} suites, ${total} checks`)
-    .replace(/tests-\d+%20passing/g, `tests-${total}%20passing`);
-  if (updated === readme) {
-    console.log('README already up to date');
-  } else {
-    fs.writeFileSync(readmePath, updated, 'utf8');
-    console.log(`README updated: ${rows.length} suites, ${total} checks`);
+  // Both translations quote the totals. Update each in its own phrasing so neither
+  // can drift, and report per file.
+  const targets = [
+    { file: 'README.md', patterns: [[/\d+ 个套件\s*\/\s*\d+ 项检查/g, `${rows.length} 个套件 / ${total} 项检查`]] },
+    { file: 'README.en.md', patterns: [[/\d+ suites\s*\/\s*\d+ checks/g, `${rows.length} suites / ${total} checks`]] },
+  ];
+  for (const { file, patterns } of targets) {
+    const target = path.join(root, file);
+    if (!fs.existsSync(target)) continue;
+    const before = fs.readFileSync(target, 'utf8');
+    let after = before;
+    for (const [pattern, replacement] of patterns) after = after.replace(pattern, replacement);
+    if (after === before) {
+      console.log(`${file}: already up to date`);
+    } else {
+      fs.writeFileSync(target, after, 'utf8');
+      console.log(`${file}: updated to ${rows.length} suites / ${total} checks`);
+    }
   }
 }
 
